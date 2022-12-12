@@ -9,7 +9,7 @@ def wait_until(xpath_str): # 해당 조건의 element가 나올 때 까지의 �
     WebDriverWait(browser, 30).until(EC.presence_of_element_located((By.XPATH, xpath_str)))
 
 browser = webdriver.Chrome()
-browser.maximize_window
+browser.maximize_window()
 
 url = 'https://flight.naver.com/'
 browser.get(url)
