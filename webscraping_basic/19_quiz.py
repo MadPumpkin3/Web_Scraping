@@ -8,11 +8,23 @@ res = requests.get(url, headers=headers)
 res.raise_for_status()
 soup = BeautifulSoup(res.text, "lxml")
 
-reals = soup.find_all("ol", attrs={"class":"list_place"})
-print(len(reals))
+reals = soup.find_all("div", attrs={"class":"cont_place"})
+count = 0
 
 for real in reals:
+    count += 1
     trans_data = real.find("div", attrs={"class":"wrap_tit"}).get_text()
-    trans = trans_data[2:4]
-    area_data = real.find("span", attrs={"title":"공급 1,047.86평 / 전용 888.44평"}).get_text()
-    area = area_data
+    trans = trans_data[2:4]  # 거래 종류
+    area_height_data = real.find_all("span", attrs={"class":"f_eb"}) # 면적 및 층 정보
+    area = area_height_data[1].get_text() # 면적
+    height = area_height_data[2].get_text() # 층
+    valus_data = real.find("span", attrs={"class":"f_red"}).get_text()
+    valus = valus_data # 가격
+    address_data = real.find("div", attrs={"class":"info_more"}).get_text()
+    address = address_data[9:] # 주소
+    print("="*10, f"매물 {count}", "="*10)
+    print("거래 :",trans)
+    print(f"면적 : {area} (공급/전용)")
+    print(f"가격 : {valus} (만원)")
+    print("주소 :",address)
+    print("층 :",height)
