@@ -30,7 +30,7 @@ def scrape_weather():
     am_weather = weathers[0].get_text() # 오전 강수
     pm_weather = weathers[1].get_text() # 오후 강수
     # 미세먼지 농도
-    fine_dust = dust_soup.find("div", attrs={"class":"grade level2 _level"}).get_text()
+    fine_dust = dust_soup.find("div", attrs={"class":"grade level2 _level"})
     
     
     # 출력
