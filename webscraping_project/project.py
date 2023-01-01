@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import time
 
 # Project) 웹 스크래핑을 이용하여 나만의 비서를 만드시오.
 
@@ -10,10 +11,15 @@ from bs4 import BeautifulSoup
 # 4. 해커스 어학원 홈페이지에서 오늘의 영어 회화 지문을 가져온다.
 
 def create_soup(url):
-    res = requests.get(url)
+    headers = {"user-agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"}
+    res = requests.get(url, headers=headers)
     res.raise_for_status()
     soup = BeautifulSoup(res.text, "lxml")
     return soup
+
+def print_news(index, title, link):
+    print("{}. {}".format(index+1, title))
+    print("  (링크 : {})".format(link))
 
 def scrape_weather():
     print("[오늘의 날씨]")
@@ -57,13 +63,27 @@ def scrape_headline_news():
     for index, news_titles in enumerate(news_list):
         if index < 5:
             title = news_titles.find("div", attrs={"class":"cjs_t"}).get_text()
-            href = news_titles.find("a")["href"]
-            print(f"----------뉴스{index+1}----------")
-            print(f"{index+1}. {title}")
-            print(f"  (링크 : {href})")
+            link = news_titles.find("a")["href"]
+            # print(f"----------뉴스{index+1}----------")
+            print_news(index, title, link)
         else:
             break
 
+def scrape_it_news():
+    print("[IT 뉴스]")
+    url = "https://news.naver.com/main/list.naver?mode=LS2D&mid=shm&sid1=105&sid2=230"
+    soup = create_soup(url)
+    news_list = soup.find("ul", attrs={"class":"type06_headline"}).find_all("li", limit=3) # 3개까지만 가져오기
+    for index, news in enumerate(news_list):
+        a_idx = 0
+        img = news.find("img")
+        if img:
+            a_idx = 1 # img 태그가 있으면 1번째 a 태그의 정보를 사용
+        title = news.find_all("a")[a_idx].get_text().strip()
+        link = news.find_all("a")[a_idx]["href"]
+        print_news(index, title, link)
+
 if __name__ == "__main__":
     # scrape_weather() # 오늘의 날씨 정보 가져오기
-    scrape_headline_news()
+    # scrape_headline_news() # 헤드라인 뉴스 정보 가져오기
+    scrape_it_news() # IT 뉴스 정보 가져오기
