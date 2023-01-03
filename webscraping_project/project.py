@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import time
+import re
 
 # Project) 웹 스크래핑을 이용하여 나만의 비서를 만드시오.
 
@@ -68,6 +69,7 @@ def scrape_headline_news():
             print_news(index, title, link)
         else:
             break
+    print()
 
 def scrape_it_news():
     print("[IT 뉴스]")
@@ -79,11 +81,31 @@ def scrape_it_news():
         img = news.find("img")
         if img:
             a_idx = 1 # img 태그가 있으면 1번째 a 태그의 정보를 사용
-        title = news.find_all("a")[a_idx].get_text().strip()
-        link = news.find_all("a")[a_idx]["href"]
+            
+        a_tag = news.find_all("a")[a_idx]
+        title = a_tag.get_text().strip()
+        link = a_tag["href"]
         print_news(index, title, link)
+    print()
 
+def scrape_english():
+    print("[오늘의 영어 회화]")
+    url = "https://www.hackers.co.kr/?c=s_eng/eng_contents/I_others_english&keywd=haceng_submain_lnb_eng_I_others_english&logger_kw=haceng_submain_lnb_eng_I_others_english"
+    soup = create_soup(url)
+    sentences = soup.find_all("div", attrs={"id":re.compile("^conv_kor_t")})
+    print("(영어지문)")
+    for sentence in sentences[len(sentences)//2:]: # 8문장이 있다고 가정할 때, index기준 4~7까지 잘라서 가져옴
+        print(sentence.get_text().strip())
+    
+    print()
+    
+    print("(한글지문)")
+    for sentence in sentences[:len(sentences)//2]: # 8문장이 있다고 가정할 때, index기준 0~3까지 잘라서 가져옴
+        print(sentence.get_text().strip())
+    print()
+    
 if __name__ == "__main__":
-    # scrape_weather() # 오늘의 날씨 정보 가져오기
-    # scrape_headline_news() # 헤드라인 뉴스 정보 가져오기
+    scrape_weather() # 오늘의 날씨 정보 가져오기
+    scrape_headline_news() # 헤드라인 뉴스 정보 가져오기
     scrape_it_news() # IT 뉴스 정보 가져오기
+    scrape_english() # 오늘의 영어 회화 가져오기
